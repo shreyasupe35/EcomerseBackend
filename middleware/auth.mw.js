@@ -23,7 +23,11 @@ const verifySignupBody=async (req,res,next)=>{
                 message:"Failed!userId was not provided"
             })
         }
-        
+        if(!req.body.password){
+            return res.status(400).send({
+                message:"Failed!password was not provided"
+            })
+        }
 
 
         const user =await user_model.findOne({userId:req.body.userId})
@@ -42,7 +46,27 @@ const verifySignupBody=async (req,res,next)=>{
         })
     }
 }
-
+const verifySiginbody=async (req,res,next)=>{
+    try {
+        if(!req.body.userId){
+            return res.status(400).send({
+                message:"Failed!userId was not provided"
+            })
+        }
+        if(!req.body.password){
+            return res.status(400).send({
+                message:"Failed!password was not provided"
+            })
+        }
+        next()
+    } catch (error) {
+        console.log("Error whilevalidating the request body")
+        res.status(500).send({
+            message:"error while validating the request body"
+        })
+    }
+}
 module.exports={
-    verifySignupBody:verifySignupBody
+    verifySignupBody:verifySignupBody,
+    verifySiginbody:verifySiginbody
 }
