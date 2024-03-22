@@ -1,6 +1,8 @@
 /**
  * create a mw will check if the request body is proper and correct
  */
+const authconfig=require("../config/auth.config.js")
+const jwt=require("jsonwebtoken")
 const user_model=require("../models/user.model.js")
 const verifySignupBody=async (req,res,next)=>{
     try {
@@ -66,7 +68,48 @@ const verifySiginbody=async (req,res,next)=>{
         })
     }
 }
+
+const verifyToken=(req,res,next)=>{
+    //check if the token is present in header
+    const token=req.headers['x-access-token']
+    if(!token){
+        return res.status(403).send({
+            message:"No token found ,and ur unauthorised"
+        })
+    }
+    //if its a valid token
+jwt.verify(token,authconfig.secret,async (err,decoded)=>{
+    if(err){
+        return res.status(401).send({
+            message:"Unauthorized!"
+        })
+    }
+    const user=await user_model.findOne({userId:decoded,id})
+    if(!user){
+        return res.status(401).send({
+            message:"Unauthorized!,this user for this token doesnot exit"
+        })
+    }
+    req.user=user
+    next()
+})
+
+    //then move to next
+  
+}
+const isAdmin=(req,res,next)=>{
+    const user=req.user
+    if(user && user,userType=="ADMIN"){
+        next()
+    }
+    else{
+        return res.status(403).send({
+            message:"Online admin user can access"
+        })
+    }
+}
 module.exports={
     verifySignupBody:verifySignupBody,
-    verifySiginbody:verifySiginbody
+    verifySiginbody:verifySiginbody,
+    verifyToken:verifyToken
 }

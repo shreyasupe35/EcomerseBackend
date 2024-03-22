@@ -53,6 +53,7 @@ db.once("open",()=>{
  * stitch the route to the server
  */
 require("./Routers/authrouter")(app)
+require("./Routers/category.routes.js")(app)
 app.listen(server_config.PORT,()=>{
     console.log("Server Started at port number :",server_config.PORT)
 })
