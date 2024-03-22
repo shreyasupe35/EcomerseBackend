@@ -7,7 +7,7 @@ const user_model=require("./models/user.model.js")
 const bcrypt=require("bcryptjs")
 // create an admin user at the starting of the application if not already present
 // connection with the db
-
+app.use(express.json())
 mongoose.connect(db_config.db_url)
 
 const db=mongoose.connection
@@ -22,12 +22,17 @@ db.once("open",()=>{
 
 
  async function init(){
-    let user = await user_model.findOne({userId:"ADMIN"});
-
-    if(user){
-        console.log("Admin is already present")
-        return
+   
+    try {
+        let user = await user_model.findOne({userId:"ADMIN"});
+        if(user){
+            console.log("Admin is already present")
+            return
+        }
+    } catch (error) {
+        console.log("Error while reading the data",error)
     }
+   
     try{
         user=await user_model.create({
             name:"shreya",
@@ -44,6 +49,10 @@ db.once("open",()=>{
     }
 }
 
+/**
+ * stitch the route to the server
+ */
+require("./Routers/authrouter")(app)
 app.listen(server_config.PORT,()=>{
     console.log("Server Started at port number :",server_config.PORT)
 })
